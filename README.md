@@ -2,6 +2,8 @@
 Record the code process
 
 This project coded by xpy,lcl,hyz,yz
+## Code Log
+3.18...
 ## Project Requirement
 人事管理系统要求
 
