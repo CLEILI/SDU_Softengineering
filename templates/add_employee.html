@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Employee</title>
+</head>
+<body>
+    <h1>Add Employee</h1>
+    <form method="POST">
+        <label for="id">User ID:</label>
+        <input type="text" name="id" id="id" required>
+        <label for="password">Password:</label>
+        <input type="password" name="password" id="password" required>
+        <label for="role">Role:</label>
+        <input type="text" name="role" id="role">
+        <button type="submit">Add Employee</button>
+    </form>
+    <button onclick="location.href='{{ url_for('welcome') }}'">Home</button>
+</body>
+</html>

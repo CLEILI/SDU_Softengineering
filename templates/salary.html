@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Salary Information</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+<h1>Salary Information</h1>
+<table id="salaryTable">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Basic Salary</th>
+            <th>Performance Bonus</th>
+            <th>Overtime Pay</th>
+            <th>Allowances</th>
+            <th>Deductions</th>
+            <th>Total Salary</th>
+            <th>Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        <!-- Data will be populated here via JavaScript -->
+    </tbody>
+</table>
+
+<button onclick="window.history.back()">Back</button>
+
+<script>
+    $(document).ready(function() {
+        var urlParams = new URLSearchParams(window.location.search);
+        var employeeId = urlParams.get('id');
+
+        if (employeeId) {
+            $.ajax({
+                type: 'GET',
+                url: '/get_salary',  // Adjust this URL to your actual API endpoint
+                data: { id: employeeId },
+                success: function(data) {
+                    // Assume data is in the format expected from the database
+                    if (data.success) {
+                        var employee = data.employee;
+                        var row = `<tr>
+                            <td>${employee.id}</td>
+                            <td>${employee.name}</td>
+                            <td>${employee.basic_salary}</td>
+                            <td>${employee.performance_bonus}</td>
+                            <td>${employee.overtime_pay}</td>
+                            <td>${employee.allowances}</td>
+                            <td>${employee.deductions}</td>
+                            <td>${employee.salary}</td>
+                            <td>${employee.date}</td>
+                        </tr>`;
+                        $('#salaryTable tbody').append(row);
+                    } else {
+                        alert('Error fetching salary information');
+                    }
+                },
+                error: function(error) {
+                    alert('Failed to retrieve data');
+                }
+            });
+        } else {
+            alert('No employee ID provided');
+        }
+    });
+</script>
+</body>
+</html>
