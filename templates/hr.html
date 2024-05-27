@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>HR Dashboard</title>
+    <!-- 引入 jQuery 库 -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        .form-container {
+            display: none;
+            margin-top: 20px;
+        }
+
+        th {
+            cursor: pointer;
+            padding: 8px 12px;
+            position: relative;
+            width: 150px;
+            text-align: center;  /* 设置表头居中 */
+        }
+
+        th::after {
+            display: inline-block;
+            margin-left: 4px;
+            font-size: 12px;
+            vertical-align: middle;
+        }
+
+        th.sort-asc::after {
+            content: " \25B2"; /* 上升箭头 */
+        }
+
+        th.sort-desc::after {
+            content: " \25BC"; /* 下降箭头 */
+        }
+
+        th.black-arrow::after {
+            color: black;
+        }
+
+        td {
+            padding: 8px 12px;
+            text-align: center; /* 设置表格数据居中 */
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        thead, tbody {
+            border: 1px solid #000;
+        }
+
+        th, td {
+            border: 1px solid #000;
+        }
+
+        .id-column {
+            width: 60px;
+        }
+        .name-column {
+            width: 60px;
+        }
+
+        #alert {
+            margin-top: 20px;
+            display: none;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        #alert.success {
+            color: green;
+            border: 1px solid green;
+            background-color: #d4edda;
+        }
+
+        #alert.error {
+            color: red;
+            border: 1px solid red;
+            background-color: #f8d7da;
+        }
+
+    </style>
+</head>
+
+<body>
+<h1>HR Dashboard</h1>
+<h2>Employees</h2>
+
+<table id="employeeTable">
+    <thead>
+    <tr>
+        <th data-key="id" class="black-arrow id-column">ID</th>
+        <th data-key="name" class="black-arrow name-column">Name</th>
+        <th>Marital Status</th>
+        <th>Position</th>
+        <th data-key="educational_background" class="black-arrow">Educational Background</th>
+        <th>Employment Status</th>
+        <th data-key="onboarding_time" class="black-arrow">Onboarding Time</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for employee in employees %}
+    <tr>
+        <td>{{ employee.id }}</td>
+        <td>{{ employee.name }}</td>
+        <td>{{ employee.marital_status }}</td>
+        <td>{{ employee.position }}</td>
+        <td>{{ employee.educational_background }}</td>
+        <td>{{ employee.employment_status }}</td>
+        <td>{{ employee.onboarding_time }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+<!-- 各种与员工管理相关的按钮 -->
+<button id="showAddEmployeeFormBtn">Add Employee</button>
+<button id="showUpdateEmployeeFormBtn">Update Employee</button>
+<button id="showUpdateSalaryFormBtn">Update Salary</button>
+<button id="showChangePasswordFormBtn">Change Password</button>
+<button id="showDeleteEmployeeFormBtn">Delete Employee</button>
+<button onclick="location.href='{{ url_for('welcome') }}'">Home</button>
+
+<!-- 添加员工表单容器 -->
+<div id="addEmployeeFormContainer" class="form-container">
+    <h2>Add Employee</h2>
+    <form id="addEmployeeForm">
+        <label for="add_id">ID:</label>
+        <input type="text" id="add_id" name="id" required>
+        <label for="add_password">Password:</label>
+        <input type="password" id="add_password" name="password" required>
+        <label for="add_role">Role:</label>
+        <select id="add_role" name="role">
+            <option value="HR">HR</option>
+            <option value="Employee">Employee</option>
+        </select>
+        <button type="submit">Add Employee</button>
+    </form>
+</div>
+
+<!-- 更新员工表单容器 -->
+<div id="updateEmployeeFormContainer" class="form-container">
+    <h2>Update Employee</h2>
+    <form id="updateEmployeeForm">
+        <label for="update_id">ID:</label>
+        <input type="text" id="update_id" name="id" required>
+        <label for="update_name">Name:</label>
+        <input type="text" id="update_name" name="name" required>
+        <label for="update_marital_status">Marital Status:</label>
+        <select id="update_marital_status" name="marital_status" required>
+            <option value="Single">Single</option>
+            <option value="Divorced">Divorced</option>
+            <option value="Married">Married</option>
+        </select>
+        <label for="update_position">Position:</label>
+        <input type="text" id="update_position" name="position" required>
+        <label for="update_educational_background">Educational Background:</label>
+        <select id="update_educational_background" name="educational_background" required>
+            <option value="Bachelor">Bachelor</option>
+            <option value="Master">Master</option>
+            <option value="PhD">PhD</option>
+        </select>
+        <label for="update_employment_status">Employment Status:</label>
+        <select id="update_employment_status" name="employment_status" required>
+            <option value="Full-time">Full-time</option>
+            <option value="Part-time">Part-time</option>
+            <option value="Freelance">Freelance</option>
+        </select>
+        <label for="update_onboarding_time">Onboarding Time:</label>
+        <input type="date" id="update_onboarding_time" name="onboarding_time" required>
+        <button type="submit">Update Employee</button>
+    </form>
+</div>
+
+<!-- 更新薪资表单容器 -->
+<div id="updateSalaryFormContainer" class="form-container">
+    <h2>Update Salary</h2>
+    <form id="updateSalaryForm">
+        <label for="salary_id">ID:</label>
+        <input type="text" id="salary_id" name="id" required>
+        <label for="salary_name">Name:</label>
+        <input type="text" id="salary_name" name="name" required>
+        <label for="basic_salary">Basic Salary:</label>
+        <input type="number" step="0.01" id="basic_salary" name="basic_salary" required>
+        <label for="performance_bonus">Performance Bonus:</label>
+        <input type="number" step="0.01" id="performance_bonus" name="performance_bonus" required>
+        <label for="overtime_pay">Overtime Pay:</label>
+        <input type="number" step="0.01" id="overtime_pay" name="overtime_pay" required>
+        <label for="allowances">Allowances:</label>
+        <input type="number" step="0.01" id="allowances" name="allowances" required>
+        <label for="deductions">Deductions:</label>
+        <input type="number" step="0.01" id="deductions" name="deductions" required>
+        <label for="date">Date:</label>
+        <input type="date" id="date" name="date" required>
+        <label for="total_salary">Total Salary:</label>
+        <input type="number" step="0.01" id="total_salary" name="total_salary" readonly>
+        <button type="submit">Update Salary</button>
+    </form>
+</div>
+
+<!-- 更改密码表单容器 -->
+<div id="changePasswordFormContainer" class="form-container">
+    <h2>Change Password</h2>
+    <form id="changePasswordForm">
+        <label for="current_password">Current Password:</label>
+        <input type="password" id="current_password" name="current_password" required>
+        <label for="new_password">New Password:</label>
+        <input type="password" id="new_password" name="new_password" required>
+        <label for="confirm_new_password">Confirm New Password:</label>
+        <input type="password" id="confirm_new_password" name="confirm_new_password" required>
+        <button type="submit">Change Password</button>
+    </form>
+    <div id="alert"></div>
+</div>
+
+<!-- 删除员工表单容器 -->
+<div id="deleteEmployeeFormContainer" class="form-container">
+    <h2>Delete Employee</h2>
+    <form id="deleteEmployeeForm">
+        <label for="delete_id">ID:</label>
+        <input type="text" id="delete_id" name="id" required>
+        <button type="submit">Delete Employee</button>
+    </form>
+</div>
+
+<script>
+    $(document).ready(function() {
+        // 点击"Add Employee"按钮显示添加员工表单
+        $('#showAddEmployeeFormBtn').click(function() {
+            // 隐藏所有表单容器，显示添加员工表单容器
+            $('.form-container').hide();
+            $('#addEmployeeFormContainer').show();
+        });
+
+        // 点击"Update Employee"按钮显示更新员工表单
+        $('#showUpdateEmployeeFormBtn').click(function() {
+            // 隐藏所有表单容器，显示更新员工表单容器
+            $('.form-container').hide();
+            $('#updateEmployeeFormContainer').show();
+        });
+
+        // 点击"Update Salary"按钮显示更新薪资表单
+        $('#showUpdateSalaryFormBtn').click(function() {
+            // 隐藏所有表单容器，显示更新薪资表单容器
+            $('.form-container').hide();
+            $('#updateSalaryFormContainer').show();
+        });
+
+        // 点击"Change Password"按钮显示更改密码表单
+        $('#showChangePasswordFormBtn').click(function() {
+            // 隐藏所有表单容器，显示更改密码表单容器
+            $('.form-container').hide();
+            $('#changePasswordFormContainer').show();
+        });
+
+        // 点击"Delete Employee"按钮显示删除员工表单
+        $('#showDeleteEmployeeFormBtn').click(function() {
+            // 隐藏所有表单容器，显示删除员工表单容器
+            $('.form-container').hide();
+            $('#deleteEmployeeFormContainer').show();
+        });
+
+        // 提交添加员工表单
+        $('#addEmployeeForm').submit(function (event) {
+            event.preventDefault(); // 阻止默认表单提交行为
+            // 通过 AJAX 发起 POST 请求
+            $.ajax({
+                type: 'POST',
+                url: '/add_employee',
+                data: $(this).serialize(),
+                success: function (response) { // 请求成功回调函数
+                    alert('Employee added successfully');
+                    location.reload(); // 刷新页面
+                },
+                error: function (error) { // 请求失败回调函数
+                    alert('Failed to add employee');
+                }
+            });
+        });
+
+        // 提交更新员工表单
+        $('#updateEmployeeForm').submit(function (event) {
+            event.preventDefault(); // 阻止默认表单提交行为
+            // 通过 AJAX 发起 POST 请求
+            $.ajax({
+                type: 'POST',
+                url: '/update_employee',
+                data: $(this).serialize(),
+                success: function (response) { // 请求成功回调函数
+                    alert('Employee updated successfully');
+                    location.reload(); // 刷新页面
+                },
+                error: function (error) { // 请求失败回调函数
+                    alert('Failed to update employee');
+                }
+            });
+        });
+
+        // 计算并设置总薪资
+        function calculateTotalSalary() {
+            const basicSalary = parseFloat($('#basic_salary').val()) || 0;
+            const performanceBonus = parseFloat($('#performance_bonus').val()) || 0;
+            const overtimePay = parseFloat($('#overtime_pay').val()) || 0;
+            const allowances = parseFloat($('#allowances').val()) || 0;
+            const deductions = parseFloat($('#deductions').val()) || 0;
+
+            const totalSalary = basicSalary + performanceBonus + overtimePay + allowances - deductions;
+            $('#total_salary').val(totalSalary.toFixed(2));
+        }
+
+        // 当表单字段发生变化时，重新计算总薪资
+        $('#basic_salary, #performance_bonus, #overtime_pay, #allowances, #deductions').on('input', calculateTotalSalary);
+
+        // 提交更新薪资表单
+        $('#updateSalaryForm').submit(function (event) {
+            event.preventDefault(); // 阻止默认表单提交行为
+
+            // 在提交之前计算总薪资
+            calculateTotalSalary();
+
+            // 通过 AJAX 发起 POST 请求
+            $.ajax({
+                type: 'POST',
+                url: '/update_salary',
+                data: $(this).serialize(),
+                success: function (response) { // 请求成功回调函数
+                    alert('Salary updated successfully');
+                    location.reload(); // 刷新页面
+                },
+                error: function (error) { // 请求失败回调函数
+                    alert('Failed to update salary');
+                }
+            });
+        });
+
+        // 提交更改密码表单
+        $('#changePasswordForm').submit(function (event) {
+            event.preventDefault(); // 阻止默认表单提交行为
+
+            const currentPassword = $('#current_password').val();
+            const newPassword = $('#new_password').val();
+            const confirmNewPassword = $('#confirm_new_password').val();
+
+            if (newPassword !== confirmNewPassword) {
+                $('#alert').removeClass('success').addClass('error').text('The new passwords entered do not match.').show();
+                return;
+            }
+
+            // 通过 AJAX 发起 POST 请求
+            $.ajax({
+                type: 'POST',
+                url: '/change_password',
+                data: {
+                    current_password: currentPassword,
+                    new_password: newPassword
+                },
+                success: function (response) { // 请求成功回调函数
+                    if (response.success) {
+                        $('#alert').removeClass('error').addClass('success').text('Password successfully changed.').show();
+                    } else {
+                        $('#alert').removeClass('success').addClass('error').text('The current password is incorrect.').show();
+                    }
+                },
+                error: function (error) { // 请求失败回调函数
+                    $('#alert').removeClass('success').addClass('error').text('Password change failed.').show();
+                }
+            });
+        });
+
+        // 提交删除员工表单
+        $('#deleteEmployeeForm').submit(function (event) {
+            event.preventDefault(); // 阻止默认表单提交行为
+            // 通过 AJAX 发起 POST 请求
+            $.ajax({
+                type: 'POST',
+                url: '/delete_employee',
+                data: $(this).serialize(),
+                success: function (response) { // 请求成功回调函数
+                    alert('Employee deleted successfully');
+                    location.reload(); // 刷新页面
+                },
+                error: function (error) { // 请求失败回调函数
+                    alert('Failed to delete employee');
+                }
+            });
+        });
+
+        // 点击表头进行排序
+        $('th[data-key]').click(function() {
+            const th = $(this);
+            const key = th.data('key');
+            const order = th.data('order') || 'asc';  // 默认为升序
+            const rows = $('#employeeTable tbody tr').get();
+
+            rows.sort(function(a, b) {
+                const A = $(a).children('td').eq($('th[data-key="' + key + '"]').index()).text().toUpperCase();
+                const B = $(b).children('td').eq($('th[data-key="' + key + '"]').index()).text().toUpperCase();
+
+                if (A < B) {
+                    return order === 'asc' ? -1 : 1;
+                }
+                if (A > B) {
+                    return order === 'asc' ? 1 : -1;
+                }
+                return 0;
+            });
+
+            // 排序后重新附加到表格中
+            $.each(rows, function(index, row) {
+                $('#employeeTable').children('tbody').append(row);
+            });
+
+            // 清除其他表头的排序状态
+            $('th[data-key]').not(th).removeClass('sort-asc sort-desc').data('order', '');
+
+            // 切换当前表头的排序状态
+            if (order === 'asc') {
+                th.removeClass('sort-asc').addClass('sort-desc').data('order', 'desc');
+            } else {
+                th.removeClass('sort-desc').addClass('sort-asc').data('order', 'asc');
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Update Salary Info</title>
+</head>
+<body>
+    <h1>Update Salary</h1>
+    <form method="POST">
+        <label for="id">Salary ID:</label>
+        <input type="text" name="id" id="id" required>
+        <label for="name">Name:</label>
+        <input type="text" name="name" id="name" required>
+        <label for="basic_salary">Basic Salary:</label>
+        <input type="text" name="basic_salary" id="basic_salary" required>
+        <label for="performance_bonus">Performance Bonus:</label>
+        <input type="text" name="performance_bonus" id="performance_bonus" required>
+        <label for="overtime_pay">Overtime Pay:</label>
+        <input type="text" name="overtime_pay" id="overtime_pay" required>
+        <label for="allowances">Allowances:</label>
+        <input type="text" name="allowances" id="allowances" required>
+        <label for="deductions">Deductions:</label>
+        <input type="text" name="deductions" id="deductions" required>
+        <label for="date">Date:</label>
+        <input type="date" name="date" id="date" required>
+        <button type="submit">Update Salary</button>
+    </form>
+    <button onclick="location.href='{{ url_for('welcome') }}'">Home</button>
+</body>
+</html>
