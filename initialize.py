@@ -27,10 +27,11 @@ CREATE TABLE IF NOT EXISTS Employees (
 )
 ''')
 
-# 创建 Salary 表
+# 创建 Salary 表，使用employee_id作为外键，id作为主键
 cursor.execute('''
 CREATE TABLE IF NOT EXISTS Salary (
     id INTEGER PRIMARY KEY,
+    employee_id INTEGER,
     name TEXT,
     basic_salary REAL,
     performance_bonus REAL,
@@ -38,7 +39,8 @@ CREATE TABLE IF NOT EXISTS Salary (
     allowances REAL,
     deductions REAL,
     salary REAL,
-    date TEXT
+    date TEXT,
+    FOREIGN KEY (employee_id) REFERENCES Employees(id)
 )
 ''')
 
@@ -50,6 +52,6 @@ VALUES (?, ?, ?)
 ON CONFLICT(id) DO NOTHING
 ''', (0, hashed_password, 'HR'))
 
-# 提交并关闭连接
+# 提交更改并关闭连接
 conn.commit()
 conn.close()

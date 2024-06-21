@@ -3,91 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <title>HR Dashboard</title>
-    <!-- 引入 jQuery 库 -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <style>
-        .form-container {
-            display: none;
-            margin-top: 20px;
-        }
-
-        th {
-            cursor: pointer;
-            padding: 8px 12px;
-            position: relative;
-            width: 150px;
-            text-align: center;  /* 设置表头居中 */
-        }
-
-        th::after {
-            display: inline-block;
-            margin-left: 4px;
-            font-size: 12px;
-            vertical-align: middle;
-        }
-
-        th.sort-asc::after {
-            content: " \25B2"; /* 上升箭头 */
-        }
-
-        th.sort-desc::after {
-            content: " \25BC"; /* 下降箭头 */
-        }
-
-        th.black-arrow::after {
-            color: black;
-        }
-
-        td {
-            padding: 8px 12px;
-            text-align: center; /* 设置表格数据居中 */
-        }
-
-        table {
-            border-collapse: collapse;
-            width: 100%;
-        }
-
-        thead, tbody {
-            border: 1px solid #000;
-        }
-
-        th, td {
-            border: 1px solid #000;
-        }
-
-        .id-column {
-            width: 60px;
-        }
-        .name-column {
-            width: 60px;
-        }
-
-        #alert {
-            margin-top: 20px;
-            display: none;
-            padding: 10px;
-            border-radius: 5px;
-        }
-
-        #alert.success {
-            color: green;
-            border: 1px solid green;
-            background-color: #d4edda;
-        }
-
-        #alert.error {
-            color: red;
-            border: 1px solid red;
-            background-color: #f8d7da;
-        }
-
-    </style>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="static/css/hr.css">
 </head>
 
 <body>
 <h1>HR Dashboard</h1>
-<h2>Employees</h2>
+<h2>Employees Information</h2>
 
 <table id="employeeTable">
     <thead>
@@ -116,15 +40,68 @@
     </tbody>
 </table>
 
-<!-- 各种与员工管理相关的按钮 -->
-<button id="showAddEmployeeFormBtn">Add Employee</button>
-<button id="showUpdateEmployeeFormBtn">Update Employee</button>
-<button id="showUpdateSalaryFormBtn">Update Salary</button>
-<button id="showChangePasswordFormBtn">Change Password</button>
-<button id="showDeleteEmployeeFormBtn">Delete Employee</button>
-<button onclick="location.href='{{ url_for('welcome') }}'">Home</button>
+<div class="buttons">
+    <button id="showAddEmployeeFormBtn">Add Employee</button>
+    <button id="showUpdateEmployeeFormBtn">Update Employee</button>
+    <button id="showUpdateSalaryFormBtn">Update Salary</button>
+    <button id="showChangePasswordFormBtn">Change Password</button>
+    <button id="showDeleteEmployeeFormBtn">Delete Employee</button>
+    <button id="showFilterFormBtn">Filter Employees</button>
+    <button onclick="location.href='{{ url_for('welcome') }}'">Home</button>
+</div>
 
-<!-- 添加员工表单容器 -->
+<div id="pagination">
+    <button id="prevPage">Previous</button>
+    <select id="pageNumber"></select>
+    <button id="nextPage">Next</button>
+</div>
+
+<div id="filterFormContainer" class="form-container" style="display:none;">
+    <h2>Filter Employees</h2>
+    <form id="filterForm">
+        <label for="filter_position">Position:</label>
+        <select id="filter_position" name="position">
+            <option value="">All</option>
+            <option value="Software Engineer">Software Engineer</option>
+            <option value="Systems Analyst">Systems Analyst</option>
+            <option value="Network Administrator">Network Administrator</option>
+            <option value="Database Administrator">Database Administrator</option>
+            <option value="Web Developer">Web Developer</option>
+            <option value="IT Support Specialist">IT Support Specialist</option>
+            <option value="Network Administrator">Network Administrator</option>
+            <option value="Project Manager">Project Manager</option>
+            <option value="Quality Assurance Engineer">Quality Assurance Engineer</option>
+            <option value="UI Designer">UI Designer</option>
+            <option value="Cybersecurity Analyst">Cybersecurity Analyst</option>
+            {% for position in positions %}
+            <option value="{{ position }}">{{ position }}</option>
+            {% endfor %}
+        </select>
+        <label for="filter_educational_background">Educational Background:</label>
+        <select id="filter_educational_background" name="educational_background">
+            <option value="">All</option>
+            <option value="Bachelor">Bachelor</option>
+            <option value="Master">Master</option>
+            <option value="PhD">PhD</option>
+            {% for background in educational_backgrounds %}
+            <option value="{{ background }}">{{ background }}</option>
+            {% endfor %}
+        </select>
+        <label for="filter_employment_status">Employment Status:</label>
+        <select id="filter_employment_status" name="employment_status">
+            <option value="">All</option>
+            <option value="Full-time">Full-time</option>
+            <option value="Part-time">Part-time</option>
+            <option value="Freelance">Freelance</option>
+            {% for status in employment_statuses %}
+            <option value="{{ status }}">{{ status }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit">Filter</button>
+    </form>
+    <div id="filterResult"></div>
+</div>
+
 <div id="addEmployeeFormContainer" class="form-container">
     <h2>Add Employee</h2>
     <form id="addEmployeeForm">
@@ -134,14 +111,13 @@
         <input type="password" id="add_password" name="password" required>
         <label for="add_role">Role:</label>
         <select id="add_role" name="role">
-            <option value="HR">HR</option>
             <option value="Employee">Employee</option>
+            <option value="HR">HR</option>
         </select>
         <button type="submit">Add Employee</button>
     </form>
 </div>
 
-<!-- 更新员工表单容器 -->
 <div id="updateEmployeeFormContainer" class="form-container">
     <h2>Update Employee</h2>
     <form id="updateEmployeeForm">
@@ -156,7 +132,20 @@
             <option value="Married">Married</option>
         </select>
         <label for="update_position">Position:</label>
-        <input type="text" id="update_position" name="position" required>
+<!--        <input type="text" id="update_position" name="position" required>-->
+        <select id="update_position" name="position" required>
+            <option value="Software Engineer">Software Engineer</option>
+            <option value="Systems Analyst">Systems Analyst</option>
+            <option value="Network Administrator">Network Administrator</option>
+            <option value="Database Administrator">Database Administrator</option>
+            <option value="Web Developer">Web Developer</option>
+            <option value="IT Support Specialist">IT Support Specialist</option>
+            <option value="Network Administrator">Network Administrator</option>
+            <option value="Project Manager">Project Manager</option>
+            <option value="Quality Assurance Engineer">Quality Assurance Engineer</option>
+            <option value="UI Designer">UI Designer</option>
+            <option value="Cybersecurity Analyst">Cybersecurity Analyst</option>
+        </select>
         <label for="update_educational_background">Educational Background:</label>
         <select id="update_educational_background" name="educational_background" required>
             <option value="Bachelor">Bachelor</option>
@@ -175,7 +164,6 @@
     </form>
 </div>
 
-<!-- 更新薪资表单容器 -->
 <div id="updateSalaryFormContainer" class="form-container">
     <h2>Update Salary</h2>
     <form id="updateSalaryForm">
@@ -201,7 +189,6 @@
     </form>
 </div>
 
-<!-- 更改密码表单容器 -->
 <div id="changePasswordFormContainer" class="form-container">
     <h2>Change Password</h2>
     <form id="changePasswordForm">
@@ -216,7 +203,6 @@
     <div id="alert"></div>
 </div>
 
-<!-- 删除员工表单容器 -->
 <div id="deleteEmployeeFormContainer" class="form-container">
     <h2>Delete Employee</h2>
     <form id="deleteEmployeeForm">
@@ -226,205 +212,9 @@
     </form>
 </div>
 
-<script>
-    $(document).ready(function() {
-        // 点击"Add Employee"按钮显示添加员工表单
-        $('#showAddEmployeeFormBtn').click(function() {
-            // 隐藏所有表单容器，显示添加员工表单容器
-            $('.form-container').hide();
-            $('#addEmployeeFormContainer').show();
-        });
 
-        // 点击"Update Employee"按钮显示更新员工表单
-        $('#showUpdateEmployeeFormBtn').click(function() {
-            // 隐藏所有表单容器，显示更新员工表单容器
-            $('.form-container').hide();
-            $('#updateEmployeeFormContainer').show();
-        });
 
-        // 点击"Update Salary"按钮显示更新薪资表单
-        $('#showUpdateSalaryFormBtn').click(function() {
-            // 隐藏所有表单容器，显示更新薪资表单容器
-            $('.form-container').hide();
-            $('#updateSalaryFormContainer').show();
-        });
-
-        // 点击"Change Password"按钮显示更改密码表单
-        $('#showChangePasswordFormBtn').click(function() {
-            // 隐藏所有表单容器，显示更改密码表单容器
-            $('.form-container').hide();
-            $('#changePasswordFormContainer').show();
-        });
-
-        // 点击"Delete Employee"按钮显示删除员工表单
-        $('#showDeleteEmployeeFormBtn').click(function() {
-            // 隐藏所有表单容器，显示删除员工表单容器
-            $('.form-container').hide();
-            $('#deleteEmployeeFormContainer').show();
-        });
-
-        // 提交添加员工表单
-        $('#addEmployeeForm').submit(function (event) {
-            event.preventDefault(); // 阻止默认表单提交行为
-            // 通过 AJAX 发起 POST 请求
-            $.ajax({
-                type: 'POST',
-                url: '/add_employee',
-                data: $(this).serialize(),
-                success: function (response) { // 请求成功回调函数
-                    alert('Employee added successfully');
-                    location.reload(); // 刷新页面
-                },
-                error: function (error) { // 请求失败回调函数
-                    alert('Failed to add employee');
-                }
-            });
-        });
-
-        // 提交更新员工表单
-        $('#updateEmployeeForm').submit(function (event) {
-            event.preventDefault(); // 阻止默认表单提交行为
-            // 通过 AJAX 发起 POST 请求
-            $.ajax({
-                type: 'POST',
-                url: '/update_employee',
-                data: $(this).serialize(),
-                success: function (response) { // 请求成功回调函数
-                    alert('Employee updated successfully');
-                    location.reload(); // 刷新页面
-                },
-                error: function (error) { // 请求失败回调函数
-                    alert('Failed to update employee');
-                }
-            });
-        });
-
-        // 计算并设置总薪资
-        function calculateTotalSalary() {
-            const basicSalary = parseFloat($('#basic_salary').val()) || 0;
-            const performanceBonus = parseFloat($('#performance_bonus').val()) || 0;
-            const overtimePay = parseFloat($('#overtime_pay').val()) || 0;
-            const allowances = parseFloat($('#allowances').val()) || 0;
-            const deductions = parseFloat($('#deductions').val()) || 0;
-
-            const totalSalary = basicSalary + performanceBonus + overtimePay + allowances - deductions;
-            $('#total_salary').val(totalSalary.toFixed(2));
-        }
-
-        // 当表单字段发生变化时，重新计算总薪资
-        $('#basic_salary, #performance_bonus, #overtime_pay, #allowances, #deductions').on('input', calculateTotalSalary);
-
-        // 提交更新薪资表单
-        $('#updateSalaryForm').submit(function (event) {
-            event.preventDefault(); // 阻止默认表单提交行为
-
-            // 在提交之前计算总薪资
-            calculateTotalSalary();
-
-            // 通过 AJAX 发起 POST 请求
-            $.ajax({
-                type: 'POST',
-                url: '/update_salary',
-                data: $(this).serialize(),
-                success: function (response) { // 请求成功回调函数
-                    alert('Salary updated successfully');
-                    location.reload(); // 刷新页面
-                },
-                error: function (error) { // 请求失败回调函数
-                    alert('Failed to update salary');
-                }
-            });
-        });
-
-        // 提交更改密码表单
-        $('#changePasswordForm').submit(function (event) {
-            event.preventDefault(); // 阻止默认表单提交行为
-
-            const currentPassword = $('#current_password').val();
-            const newPassword = $('#new_password').val();
-            const confirmNewPassword = $('#confirm_new_password').val();
-
-            if (newPassword !== confirmNewPassword) {
-                $('#alert').removeClass('success').addClass('error').text('The new passwords entered do not match.').show();
-                return;
-            }
-
-            // 通过 AJAX 发起 POST 请求
-            $.ajax({
-                type: 'POST',
-                url: '/change_password',
-                data: {
-                    current_password: currentPassword,
-                    new_password: newPassword
-                },
-                success: function (response) { // 请求成功回调函数
-                    if (response.success) {
-                        $('#alert').removeClass('error').addClass('success').text('Password successfully changed.').show();
-                    } else {
-                        $('#alert').removeClass('success').addClass('error').text('The current password is incorrect.').show();
-                    }
-                },
-                error: function (error) { // 请求失败回调函数
-                    $('#alert').removeClass('success').addClass('error').text('Password change failed.').show();
-                }
-            });
-        });
-
-        // 提交删除员工表单
-        $('#deleteEmployeeForm').submit(function (event) {
-            event.preventDefault(); // 阻止默认表单提交行为
-            // 通过 AJAX 发起 POST 请求
-            $.ajax({
-                type: 'POST',
-                url: '/delete_employee',
-                data: $(this).serialize(),
-                success: function (response) { // 请求成功回调函数
-                    alert('Employee deleted successfully');
-                    location.reload(); // 刷新页面
-                },
-                error: function (error) { // 请求失败回调函数
-                    alert('Failed to delete employee');
-                }
-            });
-        });
-
-        // 点击表头进行排序
-        $('th[data-key]').click(function() {
-            const th = $(this);
-            const key = th.data('key');
-            const order = th.data('order') || 'asc';  // 默认为升序
-            const rows = $('#employeeTable tbody tr').get();
-
-            rows.sort(function(a, b) {
-                const A = $(a).children('td').eq($('th[data-key="' + key + '"]').index()).text().toUpperCase();
-                const B = $(b).children('td').eq($('th[data-key="' + key + '"]').index()).text().toUpperCase();
-
-                if (A < B) {
-                    return order === 'asc' ? -1 : 1;
-                }
-                if (A > B) {
-                    return order === 'asc' ? 1 : -1;
-                }
-                return 0;
-            });
-
-            // 排序后重新附加到表格中
-            $.each(rows, function(index, row) {
-                $('#employeeTable').children('tbody').append(row);
-            });
-
-            // 清除其他表头的排序状态
-            $('th[data-key]').not(th).removeClass('sort-asc sort-desc').data('order', '');
-
-            // 切换当前表头的排序状态
-            if (order === 'asc') {
-                th.removeClass('sort-asc').addClass('sort-desc').data('order', 'desc');
-            } else {
-                th.removeClass('sort-desc').addClass('sort-asc').data('order', 'asc');
-            }
-        });
-    });
-</script>
+<script src="static/js/hr.js"></script>
 
 </body>
 </html>
