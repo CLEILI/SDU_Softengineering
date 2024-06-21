@@ -2,10 +2,182 @@
 <html>
 <head>
     <title>Welcome</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 600px;
+            width: 100%;
+            transition: box-shadow 0.3s ease;
+        }
+
+        .container:hover {
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        p {
+            color: #666;
+            font-size: 16px;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        a {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #007bff;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 6px;
+            transition: background-color 0.3s ease;
+            font-size: 16px;
+        }
+
+        a:hover {
+            background-color: #0056b3;
+        }
+
+        .carousel {
+            position: relative;
+            max-width: 100%;
+            margin: 20px 0;
+        }
+
+        .carousel img {
+            width: 100%;
+            max-height: 280px; /* Adjust the height as necessary */
+            object-fit: cover; /* Ensures the image covers the container without distortion */
+            border-radius: 8px;
+            transition: transform 0.3s ease;
+        }
+
+        .carousel img:hover {
+            transform: scale(1.05);
+        }
+
+        .carousel .prev, .carousel .next {
+            cursor: pointer;
+            position: absolute;
+            top: 50%;
+            width: auto;
+            padding: 12px;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+            transition: background-color 0.3s ease;
+            border-radius: 50%;
+            background-color: rgba(0,0,0,0.5);
+            user-select: none;
+            transform: translateY(-50%);
+        }
+
+        .carousel .next {
+            right: 10px;
+        }
+
+        .carousel .prev {
+            left: 10px;
+        }
+
+        .carousel .prev:hover, .carousel .next:hover {
+            background-color: rgba(0,0,0,0.8);
+        }
+
+        .carousel-indicators {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .carousel-indicators span {
+            cursor: pointer;
+            height: 15px;
+            width: 15px;
+            margin: 0 2px;
+            background-color: #bbb;
+            border-radius: 50%;
+            display: inline-block;
+            transition: background-color 0.3s ease;
+        }
+
+        .carousel-indicators .active {
+            background-color: #717171;
+        }
+    </style>
 </head>
 <body>
-    <h1>Welcome to Our Company</h1>
-    <p>About the company information...</p>
-    <a href="{{ url_for('login') }}">Login</a>
+    <div class="container">
+        <h2>Welcome to HRMS</h2>
+        <div class="carousel">
+            <img src="static/images/1.jpg" style="display: block;">
+            <img src="static/images/2.jpg" style="display: none;">
+            <img src="static/images/3.jpg" style="display: none;">
+            <img src="static/images/4.jpg" style="display: none;">
+            <a class="prev" onclick="plusSlides(-1)">&#10094;</a>
+            <a class="next" onclick="plusSlides(1)">&#10095;</a>
+        </div>
+        <div class="carousel-indicators">
+            <span class="dot active" onclick="currentSlide(1)"></span>
+            <span class="dot" onclick="currentSlide(2)"></span>
+            <span class="dot" onclick="currentSlide(3)"></span>
+            <span class="dot" onclick="currentSlide(4)"></span>
+        </div>
+        <p>
+            Our company, founded in 2005, has been at the forefront of technological innovation. With a team of over 500 dedicated professionals, we provide top-notch solutions in software development, AI, and data analysis. Our commitment to excellence and customer satisfaction has made us a trusted partner for businesses around the globe.
+        </p>
+        <p>
+            We believe in the power of technology to transform industries and create value. Our mission is to deliver cutting-edge products that drive efficiency and growth for our clients. From custom software solutions to AI-driven analytics, we are dedicated to helping our clients achieve their business goals.
+        </p>
+        <p>
+            Join us as we continue to explore new frontiers in technology and innovation. Together, we can create a brighter future.
+        </p>
+        <a href="{{ url_for('login') }}">Login</a>
+    </div>
+    <script>
+        let slideIndex = 1;
+        showSlides(slideIndex);
+
+        function plusSlides(n) {
+            showSlides(slideIndex += n);
+        }
+
+        function currentSlide(n) {
+            showSlides(slideIndex = n);
+        }
+
+        function showSlides(n) {
+            let i;
+            let slides = document.querySelectorAll('.carousel img');
+            let dots = document.querySelectorAll('.dot');
+            if (n > slides.length) {slideIndex = 1}
+            if (n < 1) {slideIndex = slides.length}
+            for (i = 0; i < slides.length; i++) {
+                slides[i].style.display = 'none';
+            }
+            for (i = 0; i < dots.length; i++) {
+                dots[i].className = dots[i].className.replace(' active', '');
+            }
+            slides[slideIndex-1].style.display = 'block';
+            dots[slideIndex-1].className += ' active';
+        }
+    </script>
 </body>
 </html>

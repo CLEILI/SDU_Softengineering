@@ -2,81 +2,278 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Salary Information</title>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Salary</title>
     <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: #4A90E2;
+        }
+
         table {
-            width: 100%;
             border-collapse: collapse;
+            width: 100%;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+            border-radius: 8px;
+            overflow: hidden;
         }
+
         th, td {
-            border: 1px solid black;
-            padding: 8px;
-            text-align: left;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            text-align: center;
         }
+
+        thead {
+            background-color: #4A90E2;
+            color: white;
+        }
+
+        th {
+            cursor: pointer;
+            position: relative;
+            transition: background-color 0.3s ease;
+        }
+
+        th:hover {
+            background-color: #357ABD;
+        }
+
+        th::after {
+            display: inline-block;
+            margin-left: 4px;
+            font-size: 12px;
+            vertical-align: middle;
+        }
+
+        th.sort-asc::after {
+            content: " \25B2"; /* 上升箭头 */
+        }
+
+        th.sort-desc::after {
+            content: " \25BC"; /* 下降箭头 */
+        }
+
+        .form-container {
+            display: none;
+            margin-top: 20px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: box-shadow 0.3s ease;
+        }
+
+        .form-container:hover {
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        .form-container h2 {
+            margin-top: 0;
+            color: #4A90E2;
+        }
+
+        .form-container label {
+            display: block;
+            margin: 10px 0 5px;
+            color: #666;
+            font-weight: bold;
+        }
+
+        .form-container input,
+        .form-container select,
+        .form-container button {
+            width: 100%;
+            padding: 12px;
+            margin: 5px 0 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-container input:focus,
+        .form-container select:focus,
+        .form-container button:focus {
+            border-color: #4A90E2;
+            outline: none;
+        }
+
+        .form-container button {
+            background-color: #4A90E2;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-size: 16px;
+        }
+
+        .form-container button:hover {
+            background-color: #357ABD;
+        }
+
+        .buttons {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .buttons button {
+            background-color: #4A90E2;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        .buttons button:hover {
+            background-color: #357ABD;
+        }
+
+        #alert {
+            margin-top: 20px;
+            display: none;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        #alert.success {
+            color: green;
+            border: 1px solid green;
+            background-color: #d4edda;
+        }
+
+        #alert.error {
+            color: red;
+            border: 1px solid red;
+            background-color: #f8d7da;
+        }
+
+        .back-button {
+            display: inline-block;
+            background-color: #4A90E2;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+            border-radius: 6px;
+            font-size: 16px;
+            text-align: center;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+
+        .back-button:hover {
+            background-color: #357ABD;
+        }
+
     </style>
 </head>
 <body>
-<h1>Salary Information</h1>
-<table id="salaryTable">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Basic Salary</th>
-            <th>Performance Bonus</th>
-            <th>Overtime Pay</th>
-            <th>Allowances</th>
-            <th>Deductions</th>
-            <th>Total Salary</th>
-            <th>Date</th>
-        </tr>
-    </thead>
-    <tbody>
-        <!-- Data will be populated here via JavaScript -->
-    </tbody>
-</table>
+    <h1>Employee Salary</h1>
+    <table id="salaryTable">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th onclick="sortTable(2)">Basic Salary</th>
+                <th onclick="sortTable(3)">Performance Bonus</th>
+                <th onclick="sortTable(4)">Overtime Pay</th>
+                <th onclick="sortTable(5)">Allowances</th>
+                <th onclick="sortTable(6)">Deductions</th>
+                <th onclick="sortTable(7)">Total Salary</th>
+                <th onclick="sortTable(8)">Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if salary_list %}
+                {% for employee in salary_list %}
+                    <tr>
+                        <td>{{ employee.id }}</td>
+                        <td>{{ employee.name }}</td>
+                        <td>{{ employee.basic_salary }}</td>
+                        <td>{{ employee.performance_bonus }}</td>
+                        <td>{{ employee.overtime_pay }}</td>
+                        <td>{{ employee.allowances }}</td>
+                        <td>{{ employee.deductions }}</td>
+                        <td>{{ employee.salary }}</td>
+                        <td>{{ employee.date }}</td>
+                    </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td colspan="9" style="text-align: center;">No salary records found.</td>
+                </tr>
+            {% endif %}
+        </tbody>
+    </table>
 
-<button onclick="window.history.back()">Back</button>
+    <div class="buttons">
+        <button onclick="window.history.back()" class="back-button">Back</button>
+    </div>
 
-<script>
-    $(document).ready(function() {
-        var urlParams = new URLSearchParams(window.location.search);
-        var employeeId = urlParams.get('id');
-
-        if (employeeId) {
-            $.ajax({
-                type: 'GET',
-                url: '/get_salary',  // Adjust this URL to your actual API endpoint
-                data: { id: employeeId },
-                success: function(data) {
-                    // Assume data is in the format expected from the database
-                    if (data.success) {
-                        var employee = data.employee;
-                        var row = `<tr>
-                            <td>${employee.id}</td>
-                            <td>${employee.name}</td>
-                            <td>${employee.basic_salary}</td>
-                            <td>${employee.performance_bonus}</td>
-                            <td>${employee.overtime_pay}</td>
-                            <td>${employee.allowances}</td>
-                            <td>${employee.deductions}</td>
-                            <td>${employee.salary}</td>
-                            <td>${employee.date}</td>
-                        </tr>`;
-                        $('#salaryTable tbody').append(row);
-                    } else {
-                        alert('Error fetching salary information');
+    <script>
+        function sortTable(n) {
+            var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+            table = document.getElementById("salaryTable");
+            switching = true;
+            dir = "asc";
+            while (switching) {
+                switching = false;
+                rows = table.rows;
+                for (i = 1; i < (rows.length - 1); i++) {
+                    shouldSwitch = false;
+                    x = rows[i].getElementsByTagName("TD")[n];
+                    y = rows[i + 1].getElementsByTagName("TD")[n];
+                    if (dir == "asc") {
+                        if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                            shouldSwitch = true;
+                            break;
+                        }
+                    } else if (dir == "desc") {
+                        if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+                            shouldSwitch = true;
+                            break;
+                        }
                     }
-                },
-                error: function(error) {
-                    alert('Failed to retrieve data');
                 }
-            });
-        } else {
-            alert('No employee ID provided');
+                if (shouldSwitch) {
+                    rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                    switching = true;
+                    switchcount++;
+                } else {
+                    if (switchcount == 0 && dir == "asc") {
+                        dir = "desc";
+                        switching = true;
+                    }
+                }
+            }
+            updateArrows(n, dir);
         }
-    });
-</script>
+
+        function updateArrows(n, dir) {
+            var th = document.getElementsByTagName("TH");
+            for (var i = 0; i < th.length; i++) {
+                th[i].classList.remove("sort-asc", "sort-desc");
+            }
+            th[n].classList.add(dir == "asc" ? "sort-asc" : "sort-desc");
+        }
+    </script>
 </body>
 </html>

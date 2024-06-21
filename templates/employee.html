@@ -2,24 +2,223 @@
 <html>
 <head>
     <title>Employee Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 100%;
+            box-sizing: border-box;
+            transition: box-shadow 0.3s ease;
+        }
+
+        .container:hover {
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        p {
+            color: #555;
+            margin: 10px 0;
+            line-height: 1.6;
+        }
+
+        .form-container {
+            display: none;
+            flex-direction: column;
+            margin-top: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 15px;
+        }
+
+        label {
+            margin-bottom: 5px;
+            color: #666;
+            font-weight: bold;
+        }
+
+        input {
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 12px 20px;
+            background-color: #28a745;
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 0 10px;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        .home-button {
+            background-color: #007bff;
+        }
+
+        .home-button:hover {
+            background-color: #0069d9;
+        }
+
+        .salary-container {
+            display: none;
+            margin-top: 20px;
+        }
+
+        #alert {
+            display: none;
+            margin-top: 10px;
+            padding: 12px;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .success {
+            color: #155724;
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+        }
+
+        .error {
+            color: #721c24;
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        function togglePasswordForm() {
+            var formContainer = document.getElementById('changePasswordFormContainer');
+            if (formContainer.style.display === 'none' || formContainer.style.display === '') {
+                formContainer.style.display = 'flex';
+            } else {
+                formContainer.style.display = 'none';
+            }
+        }
+
+        $(document).ready(function () {
+            $('#changePasswordForm').submit(function (event) {
+                event.preventDefault();
+
+                const currentPassword = $('#current_password').val();
+                const newPassword = $('#new_password').val();
+                const confirmNewPassword = $('#confirm_new_password').val();
+
+                if (newPassword !== confirmNewPassword) {
+                    $('#alert').removeClass('success').addClass('error').text('The new passwords entered do not match.').show();
+                    return;
+                }
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/change_password',
+                    data: {
+                        current_password: currentPassword,
+                        new_password: newPassword,
+                        confirm_new_password: confirmNewPassword
+                    },
+                    success: function (response) {
+                        if (response.correctCurrentPassword) {
+                            if (response.success) {
+                                $('#alert').removeClass('error').addClass('success').text('Password successfully changed.').show();
+                            } else {
+                                $('#alert').removeClass('success').addClass('error').text('Password change failed.').show();
+                            }
+                        } else {
+                            $('#alert').removeClass('error').addClass('success').text('Password successfully changed.').show();
+                        }
+                    },
+                    error: function (error) {
+                        $('#alert').removeClass('success').addClass('error').text('Password change failed.').show();
+                    }
+                });
+            });
+        });
+    </script>
 </head>
 <body>
-    <h1>Welcome {{ employee.name }}</h1>
-    <p>ID: {{ employee.id }}</p>
-    <p>Marital Status: {{ employee.marital_status }}</p>
-    <p>Position: {{ employee.position }}</p>
-    <p>Educational Background: {{ employee.educational_background }}</p>
-    <p>Employment Status: {{ employee.employment_status }}</p>
-    <p>Onboarding Time: {{ employee.onboarding_time }}</p>
-    <form method="POST" action="{{ url_for('change_password') }}">
-        <label for="current_password">Current Password:</label>
-        <input type="password" name="current_password" id="current_password" required>
-        <label for="new_password">New Password:</label>
-        <input type="password" name="new_password" id="new_password" required>
-        <label for="confirm_new_password">Confirm New Password:</label>
-        <input type="password" name="confirm_new_password" id="confirm_new_password" required>
-        <button type="submit">Change Password</button>
-    </form>
-    <button onclick="location.href='{{ url_for('welcome') }}'">Home</button>
+    <div class="container">
+        <h1>Welcome {{ employee.name }}</h1>
+        <p>ID: {{ employee.id }}</p>
+        <p>Marital Status: {{ employee.marital_status }}</p>
+        <p>Position: {{ employee.position }}</p>
+        <p>Educational Background: {{ employee.educational_background }}</p>
+        <p>Employment Status: {{ employee.employment_status }}</p>
+        <p>Onboarding Time: {{ employee.onboarding_time }}</p>
+        <div class="button-container">
+            <button onclick="togglePasswordForm()">Change Password</button>
+            <!-- 修改后的代码：表单提交到 employee_salary 路由 -->
+            <form action="{{ url_for('employee_salary') }}" method="get">
+                <input type="hidden" name="employee_id" value="{{ employee.id }}">
+                <button type="submit">Show Salary</button>
+            </form>
+            <button class="home-button" onclick="location.href='{{ url_for('welcome') }}'">Home</button>
+        </div>
+        <div id="salaryContainer" class="salary-container"></div>
+        <div id="changePasswordFormContainer" class="form-container">
+            <h2>Change Password</h2>
+            <form id="changePasswordForm">
+                <div class="form-group">
+                    <label for="current_password">Current Password:</label>
+                    <input type="password" id="current_password" name="current_password" required>
+                </div>
+                <div class="form-group">
+                    <label for="new_password">New Password:</label>
+                    <input type="password" id="new_password" name="new_password" required>
+                </div>
+                <div class="form-group">
+                    <label for="confirm_new_password">Confirm New Password:</label>
+                    <input type="password" id="confirm_new_password" name="confirm_new_password" required>
+                </div>
+                <div class="button-container">
+                    <button type="submit">Change Password</button>
+                </div>
+            </form>
+            <div id="alert"></div>
+        </div>
+    </div>
 </body>
 </html>
